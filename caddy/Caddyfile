@@ -39,7 +39,7 @@
 				{$BASIC_AUTH_USER:admin} {$BASIC_AUTH_HASH}
 			}
 
-			reverse_proxy {TELEGRAM_MCP_URL}
+			reverse_proxy {$TELEGRAM_MCP_URL}
 		}
 	}
 }

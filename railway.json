@@ -3,7 +3,7 @@
   "build": {
     "builder": "DOCKERFILE",
     "dockerfilePath": "Dockerfile",
-    "watchPaths": ["!/caddy"]
+    "watchPaths": ["!/caddy/**"]
   },
   "deploy": {
     "healthcheckPath": "/status",
