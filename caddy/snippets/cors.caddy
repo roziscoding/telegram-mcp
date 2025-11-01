@@ -1,0 +1,19 @@
+(cors) {
+	@cors_preflight method OPTIONS
+
+	header {
+		Access-Control-Allow-Origin "*"
+		Vary Origin
+		Access-Control-Expose-Headers "Authorization"
+		Access-Control-Allow-Credentials "true"
+	}
+
+	handle @cors_preflight {
+		header {
+			Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, HEAD"
+			Access-Control-Allow-Headers "*"
+			Access-Control-Max-Age "3600"
+		}
+		respond "" 204
+	}
+}

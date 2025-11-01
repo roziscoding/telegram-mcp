@@ -198,7 +198,7 @@ You have two options:
 
 **Option A: Using Docker Compose (Recommended for Local Use)**
 
-This method uses the `docker-compose.yml` file and automatically reads your credentials from a `.env` file.
+This method uses the `docker-compose.yml` file and automatically reads your credentials from a `.env` file. It also includes the MCP Inspector for easy testing and debugging.
 
 1.  **Create `.env` File:** Ensure you have a `.env` file in the project root containing your `TELEGRAM_API_ID`, `TELEGRAM_API_HASH`, and `TELEGRAM_SESSION_STRING` (or `TELEGRAM_SESSION_NAME`). Use `.env.example` as a template.
 2.  **Run Compose:**
@@ -207,6 +207,16 @@ This method uses the `docker-compose.yml` file and automatically reads your cred
     ```
     *   Use `docker compose up -d` to run in detached mode (background).
     *   Press `Ctrl+C` to stop the server.
+
+3.  **Access Services:**
+    *   **Telegram MCP Server (SSE):** `http://localhost:8080/sse`
+    *   **MCP Inspector UI:** `http://localhost:6274/`
+
+4.  **Connect Inspector to Server:**
+    *   Open the Inspector UI in your browser
+    *   Change **Transport Type** to **SSE**
+    *   Set **Server URL** to: `http://telegram-mcp:8080/sse` (or `http://localhost:8080/sse` from your host)
+    *   Click **Connect** to start inspecting and testing your Telegram MCP tools
 
 **Option B: Using `docker run`**
 

@@ -1,0 +1,11 @@
+(auth) {
+	forward_auth {$AUTH_SERVICE_URL:localhost:3000} {
+		uri /data-token
+
+		copy_headers x-data-token x-request-id
+	}
+}
+
+(request_id) {
+	header >x-request-id {http.request.uuid}
+}

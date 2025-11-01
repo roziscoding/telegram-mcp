@@ -1,20 +1,62 @@
-version: '3.8'
-
 services:
   telegram-mcp:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: telegram-mcp
-    # Load environment variables from a .env file in the same directory
     env_file:
       - .env
-    # Keep stdin open and allocate a pseudo-TTY, crucial for stdio MCP servers
-    stdin_open: true
-    tty: true
-    # Optional: Uncomment the following lines to mount a local directory
-    # for persisting the Telegram session file if NOT using TELEGRAM_SESSION_STRING.
-    # Replace './telegram_sessions' with your desired host path.
-    # volumes:
-    #   - ./telegram_sessions:/app
-    restart: unless-stopped 
+    restart: unless-stopped
+    networks:
+      - caddy
+    labels:
+      caddy: telegram-mcp.localhost
+      caddy.reverse_proxy: "{{upstreams 8080}}"
+
+  mcp-inspector:
+    image: ghcr.io/modelcontextprotocol/inspector:latest
+    container_name: mcp-inspector
+    environment:
+      - HOST=0.0.0.0
+      - ALLOWED_ORIGINS=http://inspector.localhost
+      - MCP_AUTO_OPEN_ENABLED=false
+      - DANGEROUSLY_OMIT_AUTH=true
+    volumes:
+      - ./inspector-config.json:/app/config.json:ro
+    ports:
+      - 6277:6277
+    restart: unless-stopped
+    depends_on:
+      - telegram-mcp
+    entrypoint: ["node", "cli/build/cli.js", "--config", "/app/config.json"]
+    networks:
+      - caddy
+    labels:
+      caddy: http://inspector.localhost
+      caddy.reverse_proxy: "{{upstreams 6274}}"
+      caddy.reverse_proxy.header_down_1: +Access-Control-Allow-Origin "*"
+      caddy.reverse_proxy.header_down_2: +Access-Control-Allow-Methods "*"
+      caddy.reverse_proxy.header_down_3: +Access-Control-Allow-Headers "*"
+      caddy.reverse_proxy.header_down_4: +Access-Control-Allow-Credentials "true"
+
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:ci-alpine
+    ports:
+      - 80:80
+      - 443:443/tcp
+      - 443:443/udp
+    environment:
+      - CADDY_INGRESS_NETWORKS=caddy
+    networks:
+      - caddy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - caddy_data:/data
+    restart: unless-stopped
+
+networks:
+  caddy:
+    external: true
+
+volumes:
+  caddy_data: {}

@@ -21,6 +21,7 @@ ENV PYTHONUNBUFFERED=1
 COPY requirements.txt ./
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir mcp-proxy
 
 # Copy the rest of the application code
 COPY main.py .
@@ -40,8 +41,9 @@ ENV TELEGRAM_SESSION_NAME="telegram_mcp_session"
 # Or provide the session string directly
 ENV TELEGRAM_SESSION_STRING=""
 
-# Expose any ports if the application were a web server (not needed for stdio MCP)
-# EXPOSE 8000
+# Expose the mcp-proxy HTTP/SSE endpoint
+EXPOSE 8080
 
-# Define the command to run the application
-CMD ["python", "main.py"] 
+# Define the command to run the application via mcp-proxy
+# mcp-proxy will expose main.py as an HTTP/SSE endpoint on port 8080
+CMD ["mcp-proxy", "--port=8080", "--host=0.0.0.0", "--pass-environment", "python", "main.py"] 

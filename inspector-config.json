@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "telegram-mcp": {
+      "type": "sse",
+      "url": "http://telegram-mcp:8080/sse",
+      "note": "Telegram MCP Server"
+    }
+  }
+}
