@@ -18,20 +18,28 @@
 	}
 }
 
-:{$PORT:8443} {
-	basic_auth {
-		{$BASIC_AUTH_USER:admin} {$BASIC_AUTH_HASH}
-	}
+{
+	admin off
+}
 
+:{$PORT:8443} {
 	import cors {header.origin}
 
-	@healthcheck {
-		path_regexp healthcheck ^/healthcheck/?$
-	}
-	handle @healthcheck {
-		header Content-Type application/json
-		respond "{ \"ok\": true }" 200
-	}
+	route {
+		@healthcheck {
+			path_regexp healthcheck ^/healthcheck/?$
+		}
+		handle @healthcheck {
+			header Content-Type application/json
+			respond "{ \"ok\": true }" 200
+		}
 
-	reverse_proxy ${TELEGRAM_MCP_URL}:8080
+		handle {
+			basic_auth {
+				{$BASIC_AUTH_USER:admin} {$BASIC_AUTH_HASH}
+			}
+
+			reverse_proxy ${TELEGRAM_MCP_URL}:8080
+		}
+	}
 }
